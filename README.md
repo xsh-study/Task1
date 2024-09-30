@@ -5,7 +5,7 @@ x^3, x // => 3*x^2
 
 x^3, y // => 0
 
-7*x - x^4 // => 7 - 4*x^3
+7*x - x^4, x // => 7 - 4*x^3
 ```
 3. Only *, -, + and ^ operations are allowed.
 4. There should be a text input(s) on a page to provide

@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Diff Demo</title>
-    <meta charset="UTF-8" />
-
-    <script src="src/index.js" type="module"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expression Differentiation</title>
+    <script type="module" src="src/index.js" defer></script>
 </head>
-
 <body>
-
-    <div class="container" id="mathContainer">
-        <div>
-            <button id = 'newExprButton'>
-                Show new expression!
-            </button>
-        </div>
-    </div>
-
+<h1>Expression Differentiation</h1>
+<div>
+    <label for="expression">Expression:</label>
+    <input type="text" id="expression" placeholder="e.g., x^3 - 4*x + 7">
+</div>
+<div>
+    <label for="variable">Variable:</label>
+    <input type="text" id="variable" placeholder="e.g., x">
+</div>
+<button id="diffButton">Differentiate</button>
+<h2>Result:</h2>
+<div id="result"></div>
 </body>
 </html>

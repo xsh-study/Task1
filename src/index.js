@@ -1,15 +1,15 @@
-import {Expression} from "./expression";
 
-document.addEventListener('DOMContentLoaded',setup);
 
-function setup(){
-    const button = document.getElementById('newExprButton');
-    button.onclick = addExpression;
-}
-function addExpression(){
-    const expression = new Expression('3*x');
-    const container = document.getElementById('mathContainer');
-    const expressionElement = document.createElement('div');
-    expressionElement.innerHTML = expression.toString();
-    container.appendChild(expressionElement);
-}
+
+import { Expression } from './expression.js'; // Adjust the path as needed
+
+document.getElementById('diffButton').addEventListener('click', () => {
+    const expressionInput = document.getElementById('expression').value;
+    const variableInput = document.getElementById('variable').value;
+
+    const expr = new Expression(expressionInput);
+    const result = expr.diff(variableInput).toString();
+
+    // Display the result in the result div
+    document.getElementById('result').textContent = result;
+});
