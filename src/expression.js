@@ -1,58 +1,65 @@
 class Expression {
-    // Constructor that accepts an expression string as input
-    constructor(inputString) {
-        this._expr = inputString; // Store the input expression
+    constructor(expressionStr) {
+        this.expressionStr = expressionStr;
     }
 
-    // toString method to return a formatted expression string
-    toString() {
-        // Simplify and format the expression, e.g., x^1 becomes x
-        return this._expr
-            .replace(/\^1/g, '')  // Remove all occurrences of x^1, simplifying it to x
-            .replace(/\+/g, '+ ') // Add a space after each '+' for readability
-            .replace(/-/g, '- '); // Add a space after each '-' for readability
-    }
-
-    // diff method to compute the derivative with respect to a given variable
+    // diff method to differentiate with respect to the given variable
     diff(variable) {
-        // Check if the variable appears in the expression, if not, return '0'
-        if (!new RegExp(variable).test(this._expr)) {
-            return new Expression('0'); // No matching variable, derivative is 0
+        let terms = this._parseExpression(this.expressionStr);
+        let differentiatedTerms = terms.map(term => this._differentiateTerm(term, variable));
+
+        // Filter out "0" terms from the result
+        differentiatedTerms = differentiatedTerms.filter(term => term !== '0');
+
+        // Process the result to ensure correct formatting
+        return new Expression(this._formatTerms(differentiatedTerms));
+    }
+
+    // Parse the simple expression (only supports terms separated by + and -)
+    _parseExpression(expr) {
+        // Use a regular expression to split by + and - while keeping the signs
+        return expr.match(/[+-]?\d*\*?[a-z]?\^?\d*/g).filter(Boolean);
+    }
+
+    // Differentiate a single term
+    _differentiateTerm(term, variable) {
+        let match = term.match(/([+-]?\d*)\*?([a-z])?\^?(\d*)/);
+        if (!match) return '0';
+
+        let [, coefficient, varName, exponent] = match;
+        coefficient = coefficient === '' || coefficient === '+' ? 1 : coefficient === '-' ? -1 : parseInt(coefficient);
+        exponent = exponent === '' ? 1 : parseInt(exponent);
+
+        if (varName !== variable) {
+            // If the variable does not match the differentiation variable, return 0
+            return '0';
         }
 
-        const expr = this._expr; // Store the current expression
-        // Adjust regex to account for multiplication (*) and handle cases like 2*x^3
-        const termRegex = /([+-]?[\d]*\.?[\d]*)?\*?([a-z])(?:\^(\d+))?/g;
-        // termRegex matches each term in the expression, considering multiplication
-
-        const result = []; // This will store the terms of the derivative
-
-        let match;
-        // Loop through each term in the expression using the regular expression
-        while ((match = termRegex.exec(expr)) !== null) {
-            // Extract the coefficient, default is 1 (if empty, the default value is 1)
-            const coeff = match[1] ? (match[1] === '+' ? 1 : match[1] === '-' ? -1 : parseFloat(match[1])) : 1;
-            const varName = match[2]; // Extract the variable name
-            const exponent = match[3] ? parseInt(match[3]) : 1; // Extract the exponent, default is 1 if empty
-
-            // Check if the term contains the specified variable
-            if (varName === variable) {
-                if (exponent > 1) {
-                    // When the exponent is greater than 1, compute the derivative (e.g., 3*x^2 -> 6*x)
-                    result.push(`${coeff * exponent}*${varName}^${exponent - 1}`);
-                } else if (exponent === 1) {
-                    // When the exponent is 1, the derivative is just the coefficient (e.g., x -> 1)
-                    result.push(`${coeff}`);
-                }
-            } else {
-                // If the variable does not match, retain the term as is
-                result.push(match[0]);
-            }
+        if (exponent === 1) {
+            // If the exponent is 1, the derivative is just the coefficient
+            return `${coefficient}`;
         }
 
-        // Return a new Expression object
-        // Join the result array with ' + ' and simplify the handling of '+' and '-' signs
-        return new Expression(result.length > 0 ? result.join(' + ').replace(/\+\s*-\s*/g, '-') : '0');
+        // General case: power rule n*x^(n-1)
+        let newCoefficient = coefficient * exponent;
+        let newExponent = exponent - 1;
+
+        return newExponent === 1 ? `${newCoefficient}*${variable}` : `${newCoefficient}*${variable}^${newExponent}`;
+    }
+
+    // Format the resulting terms to ensure correct display of '+' and '-'
+    _formatTerms(terms) {
+        return terms
+            .map(term => term.startsWith('-') ? term : `+${term}`) // Add '+' for positive terms
+            .join('')
+            .replace(/^\+/, '') // Remove leading '+'
+            .replace(/\+-/g, '-') // Replace '+-' with '-'
+            .replace(/-\+/g, '-'); // Replace '-+' with '-'
+    }
+
+    // toString method returns the string representation of the expression
+    toString() {
+        return this.expressionStr || '0'; // If the expression is empty, return '0'
     }
 }
 
